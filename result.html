@@ -1,55 +1,211 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>검색결과 – 내 손 안의 행정비서</title>
+  <style>
+    :root { --border:#dadce0; --bg:#fffcf0; }
+    *{box-sizing:border-box; margin:0; padding:0;}
+    body{ background:var(--bg); font-family:-apple-system, "Noto Sans KR", sans-serif; color:#202124; margin:0; }
 
-/* 로딩 상태 */
-.loading{ display:flex; align-items:center; gap:10px; padding:8px 0; }
-    .loading img{ width:50px; height:50px; display:block; }
-    .loading img{ width:90px; height:50px; display:block; }
-.hidden{ display:none !important; }
+    /* 헤더 */
+    header{
+      position:sticky; top:0; z-index:10;
+      background:var(--bg); border-bottom:1px solid #eee;
+    }
+    .header-inner{
+      max-width:1080px; margin:0 auto; padding:12px 16px;
+      display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    }
+    .logos{display:flex; align-items:center; gap:10px;}
+    .logos img{height:40px;}
+    .mainlogo{height:48px; transition:height .18s ease;}
+    .search-wrap{flex:1; display:flex; align-items:center; gap:10px;}
+    .bar{
+      flex:1; display:flex; align-items:center; gap:10px;
+      padding:8px 14px; background:#fff;
+      border:1px solid var(--border); border-radius:24px;
+    }
+    .bar input{
+      flex:1; border:0; outline:0; font-size:15px; background:transparent;
+    }
+    .bar button{
+      padding:8px 14px; border:2px solid #000;
+      background:#fff; border-radius:6px; cursor:pointer; transition:.2s;
+    }
+    .bar button:hover{background:#000;color:#fff;}
+    .actions{display:flex; gap:8px; flex-wrap:wrap;}
+    .btn{ padding:8px 12px; border:2px solid #000; background:#fff; border-radius:6px; cursor:pointer; font-size:14px; transition:.2s; }
+    .btn:hover{background:#000;color:#fff;}
 
-/* 캐릭터 (index와 동일한 규칙 사용 가능) */
-@@ -70,7 +70,7 @@
-.bar input{font-size:14px;}
-.btn{font-size:13px; padding:6px 10px;}
-.result-box{padding:14px;}
-      .loading img{ width:50px; height:50px; } /* 스피너 축소 */
+    /* 내용 */
+    main{max-width:800px;margin:24px auto;padding:0 16px;}
+    .result-box{
+      background:#fff; border:1px solid #ddd;
+      border-radius:12px; padding:18px; position:relative;
+      min-height:160px;
+    }
+    .qline{font-size:14px;color:#5f6368;margin-bottom:8px;}
+    .answer{white-space:pre-line;line-height:1.7; word-break:break-word;}
+
+    /* 시연 버튼 */
+    .demo-buttons{ position:absolute; top:12px; right:12px; display:flex; gap:6px; }
+    .demo-btn{ padding:5px 10px; font-size:13px; border:1px solid #000; background:#fff; border-radius:6px; cursor:pointer; transition:.2s; }
+    .demo-btn:hover{background:#000;color:#fff;}
+
+    /* 로딩 상태 */
+    .loading{ display:flex; align-items:center; gap:10px; padding:8px 0; }
+    .loading img{ width:50px; height:30px; display:block; }
+    .hidden{ display:none !important; }
+
+    /* 캐릭터 (index와 동일한 규칙 사용 가능) */
+    .chara-small{ position:fixed; bottom:12px; right:12px; width:180px; opacity:0.9; z-index:5; pointer-events:none; display:none; }
+
+    /* 반응형: 모바일에서 축소 */
+    @media(max-width:768px){
+      .header-inner{gap:8px;}
+      .logos img{height:32px;}
+      .mainlogo{height:40px;}
+      .bar input{font-size:14px;}
+      .btn{font-size:13px; padding:6px 10px;}
+      .result-box{padding:14px;}
       .loading img{ width:90px; height:50px; } /* 스피너 축소 */
-.chara-small{ width:70px; bottom:10px; right:8px; } /* 캐릭터 축소 */
-}
+      .chara-small{ width:70px; bottom:10px; right:8px; } /* 캐릭터 축소 */
+    }
 
-@@ -112,36 +112,36 @@
-<div class="qline" id="qline"></div>
+    /* 데스크톱에서 메인로고를 더 크게 보이게 */
+    @media(min-width:1024px){
+      .mainlogo{ height:64px; } /* 변경: 데스크톱에서 크게 */
+    }
+  </style>
+  </head>
+<body>
+  <header>
+<div class="header-inner">
+    <a href="https://jjinooh.github.io/administrative_secretary/" class="logos" style="text-decoration:none;">
+      <img src="sungnamlogo.png" class="seongnam" alt="성남시 로고" />
+      <img src="mainlogo.jpg" class="mainlogo" alt="내 손 안의 행정비서 로고" />
+    </a>
+      </div>
 
-<div id="loading" class="loading hidden" aria-live="polite">
-        <img src="pinkgreen.gif" alt="로딩 중">
+      <div class="search-wrap">
+        <div class="bar">
+          <input id="q" placeholder="예) 수의계약은 얼마까지 가능해?" />
+          <button onclick="reSearch()">검색</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" onclick="window.open('https://www.law.go.kr/LSW/main.html')">국가법령정보</button>
+        <button class="btn" onclick="window.open('https://www.elis.go.kr/main')">자치법규정보</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="result-box">
+      <div class="demo-buttons">
+        <button class="demo-btn" onclick="demo(1)">시연1</button>
+        <button class="demo-btn" onclick="demo(2)">시연2</button>
+      </div>
+
+      <div class="qline" id="qline"></div>
+
+      <div id="loading" class="loading hidden" aria-live="polite">
         <img src="pinkgreen1.gif" alt="로딩 중">
-<span>🔄 조회 중입니다…</span>
-</div>
+        <span>🔄 조회 중입니다…</span>
+      </div>
 
-<div class="answer" id="answer">검색어를 입력하고 ‘검색’을 눌러주세요.</div>
-</div>
-</main>
+      <div class="answer" id="answer">검색어를 입력하고 ‘검색’을 눌러주세요.</div>
+    </div>
+  </main>
 
-  <img src="pinkgreen.gif" class="chara-small" alt="초랭이" id="floatingChara">
   <img src="pinkgreen1.gif" class="chara-small" alt="초랭이" id="floatingChara">
 
-<script>
-// 💡 중요: 이 URL을 **본인의 Apps Script 웹앱 URL로 교체**해야 합니다.
-// 기존 URL 유지:
-const ASK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd_EABVzt49XDVzgyr0FI3ybwOSGrit77To0kh27RnOTnmBVLT_xgAXYItOZjKq7eT7g/exec';
+  <script>
+    // 💡 중요: 이 URL을 **본인의 Apps Script 웹앱 URL로 교체**해야 합니다.
+    // 기존 URL 유지:
+    const ASK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd_EABVzt49XDVzgyr0FI3ybwOSGrit77To0kh27RnOTnmBVLT_xgAXYItOZjKq7eT7g/exec';
 
-const params = new URLSearchParams(location.search);
-const initialQ = params.get('q') || '';
-const $q = document.getElementById('q');
-const $qline = document.getElementById('qline');
-const $answer = document.getElementById('answer');
-const $loading = document.getElementById('loading');
-const $chara = document.getElementById('floatingChara');
+    const params = new URLSearchParams(location.search);
+    const initialQ = params.get('q') || '';
+    const $q = document.getElementById('q');
+    const $qline = document.getElementById('qline');
+    const $answer = document.getElementById('answer');
+    const $loading = document.getElementById('loading');
+    const $chara = document.getElementById('floatingChara');
 
-if(initialQ){ $q.value = initialQ; fetchAnswer(initialQ); }
+    if(initialQ){ $q.value = initialQ; fetchAnswer(initialQ); }
 
-function reSearch(){
-const val = $q.value.trim();
-if(!val) return;
-// 서브경로에서 동작하도록 상대경로 사용
-history.replaceState(null,'','result.html?q='+encodeURIComponent(val));
-fetchAnswer(val);
-}
+    function reSearch(){
+      const val = $q.value.trim();
+      if(!val) return;
+      // 서브경로에서 동작하도록 상대경로 사용
+      history.replaceState(null,'','result.html?q='+encodeURIComponent(val));
+      fetchAnswer(val);
+    }
+
+    function demo(type){
+      const text = (type===1) ? '수의계약은 얼마까지 가능해?' : '협상에 의한 계약 절차 알려줘';
+      $q.value = text;
+      history.replaceState(null,'','result.html?q='+encodeURIComponent(text));
+      fetchAnswer(text);
+    }
+
+    function setLoading(isLoading){
+      if(isLoading){
+        $loading.classList.remove('hidden');
+        $answer.classList.add('hidden');
+        // 캐릭터 표시(선택): 모바일에서는 숨김 CSS가 적용됨
+        $chara.style.display = 'block';
+      }else{
+        $loading.classList.add('hidden');
+        $answer.classList.remove('hidden');
+        $chara.style.display = 'none';
+      }
+    }
+
+    async function fetchAnswer(q){
+      $qline.textContent = `검색어: “${q}”`;
+      setLoading(true);
+      try{
+        const res = await fetch(ASK_ENDPOINT, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ question: q })
+        });
+        
+        // HTTP 응답이 정상이 아닐 경우 (예: 404, 500 등)
+        if(!res.ok){
+          throw new Error(`Apps Script 서버 오류: HTTP ${res.status}`);
+        }
+        
+        const data = await res.json();
+        
+        // Apps Script에서 반환한 응답 메시지 처리
+        const answerText = data?.answer || '답변을 생성하지 못했습니다.';
+        
+        // 💡 중요: API 키 오류 메시지 등에 대한 클라이언트 측 경고
+        if(answerText.includes('API 키가 설정되지 않았습니다.') || answerText.startsWith('오류:')){
+          $answer.style.color = 'red';
+          $answer.textContent = '❌ 시스템 오류가 발생했습니다. Apps Script의 로그와 API 키 설정을 확인해주세요. \n\n' + answerText;
+        } else {
+          $answer.style.color = '#202124'; // 기본 색상으로 복구
+          $answer.textContent = answerText;
+        }
+        
+      }catch(e){
+        console.error(e);
+        // 네트워크 또는 파싱 오류 발생 시
+        $answer.style.color = 'red';
+        $answer.textContent = `❌ 네트워크 또는 통신 오류가 발생했습니다. (콘솔 확인) \n에러: ${e.message}`;
+      }finally{
+        setLoading(false);
+      }
+    }
+
+    $q.addEventListener('keydown', e => { if(e.key==='Enter') reSearch(); });
+  </script>
+</body>
+</html>
