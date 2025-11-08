@@ -79,13 +79,11 @@
       .mainlogo{ height:64px; } /* 변경: 데스크톱에서 크게 */
     }
   </style>
-  <!-- 웹앱 URL: ASK_ENDPOINT 에 의해 호출됩니다 -->
-</head>
+  </head>
 <body>
   <header>
     <div class="header-inner">
       <div class="logos">
-        <!-- 상대경로(서브폴더용) -->
         <img src="sungnamlogo.png" class="seongnam" alt="성남시 로고" />
         <img src="mainlogo.jpg" class="mainlogo" alt="내 손 안의 행정비서 로고" />
       </div>
@@ -113,7 +111,6 @@
 
       <div class="qline" id="qline"></div>
 
-      <!-- 로딩 UI: greenrotate.gif (상대경로) -->
       <div id="loading" class="loading hidden" aria-live="polite">
         <img src="greenrotate.gif" alt="로딩 중">
         <span>🔄 조회 중입니다…</span>
@@ -123,11 +120,11 @@
     </div>
   </main>
 
-  <!-- 페이지 우측 하단에 작게 캐릭터 표시(선택) -->
   <img src="greenhead.gif" class="chara-small" alt="초랭이" id="floatingChara">
 
   <script>
-    // ★ 네 Apps Script 웹앱 URL로 교체된 ASK_ENDPOINT (너가 준 exec URL)
+    // 💡 중요: 이 URL을 **본인의 Apps Script 웹앱 URL로 교체**해야 합니다.
+    // 기존 URL 유지:
     const ASK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd_EABVzt49XDVzgyr0FI3ybwOSGrit77To0kh27RnOTnmBVLT_xgAXYItOZjKq7eT7g/exec';
 
     const params = new URLSearchParams(location.search);
@@ -177,18 +174,31 @@
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify({ question: q })
         });
+        
+        // HTTP 응답이 정상이 아닐 경우 (예: 404, 500 등)
         if(!res.ok){
-          // 앱스크립트에서 에러를 반환하는 경우 body에 메시지가 있을 수 있음
-          const text = await res.text().catch(()=>null);
-          throw new Error('서버 오류 ' + (text || res.status));
+          throw new Error(`Apps Script 서버 오류: HTTP ${res.status}`);
         }
+        
         const data = await res.json();
-        $answer.textContent = data?.answer || '답변을 생성하지 못했습니다.';
+        
+        // Apps Script에서 반환한 응답 메시지 처리
+        const answerText = data?.answer || '답변을 생성하지 못했습니다.';
+        
+        // 💡 중요: API 키 오류 메시지 등에 대한 클라이언트 측 경고
+        if(answerText.includes('API 키가 설정되지 않았습니다.') || answerText.startsWith('오류:')){
+          $answer.style.color = 'red';
+          $answer.textContent = '❌ 시스템 오류가 발생했습니다. Apps Script의 로그와 API 키 설정을 확인해주세요. \n\n' + answerText;
+        } else {
+          $answer.style.color = '#202124'; // 기본 색상으로 복구
+          $answer.textContent = answerText;
+        }
+        
       }catch(e){
         console.error(e);
-        // 사용자에게 친절한 메시지
-        $answer.textContent = 'API 오류가 발생했습니다. (콘솔 확인) 잠시 후 다시 시도해주세요.';
-        // 일반적인 CORS 문제라면 콘솔에 "CORS" 관련 로그가 뜰 것
+        // 네트워크 또는 파싱 오류 발생 시
+        $answer.style.color = 'red';
+        $answer.textContent = `❌ 네트워크 또는 통신 오류가 발생했습니다. (콘솔 확인) \n에러: ${e.message}`;
       }finally{
         setLoading(false);
       }
