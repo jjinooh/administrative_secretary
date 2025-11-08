@@ -21,6 +21,7 @@
       max-width:1080px; margin:0 auto; padding:12px 16px;
       display:flex; align-items:center; gap:14px; flex-wrap:wrap;
     }
+    .logos{display:flex; align-items:center; gap:10px;}
     .logos img{height:40px;}
     .mainlogo{height:48px;}
     .search-wrap{flex:1; display:flex; align-items:center; gap:10px;}
@@ -35,13 +36,14 @@
     .bar button{
       padding:8px 14px; border:2px solid #000;
       background:#fff; border-radius:6px; cursor:pointer;
+      transition:.2s;
     }
     .bar button:hover{background:#000;color:#fff;}
     .actions{display:flex; gap:8px; flex-wrap:wrap;}
     .btn{
       padding:8px 12px; border:2px solid #000;
       background:#fff; border-radius:6px; cursor:pointer;
-      font-size:14px;
+      font-size:14px; transition:.2s;
     }
     .btn:hover{background:#000;color:#fff;}
 
@@ -50,6 +52,7 @@
     .result-box{
       background:#fff; border:1px solid #ddd;
       border-radius:12px; padding:18px; position:relative;
+      min-height:160px;
     }
     .qline{font-size:14px;color:#5f6368;margin-bottom:8px;}
     .answer{white-space:pre-line;line-height:1.7;}
@@ -67,6 +70,16 @@
     }
     .demo-btn:hover{background:#000;color:#fff;}
 
+    /* 로딩 상태 */
+    .loading{
+      display:flex; align-items:center; gap:10px;
+      padding:8px 0;
+    }
+    .loading img{
+      width:24px; height:24px; display:block;
+    }
+    .hidden{ display:none !important; }
+
     @media(max-width:768px){
       .header-inner{gap:8px;}
       .logos img{height:32px;}
@@ -76,13 +89,17 @@
       .result-box{padding:14px;}
     }
   </style>
+
+  <!-- 스피너 프리로드 -->
+  <link rel="preload" as="image" href="greenrotate.gif">
 </head>
 <body>
   <header>
     <div class="header-inner">
       <div class="logos">
-        <img src="성남시.png" class="seongnam" alt="성남시" />
-        <img src="내손안의행정비서 로고.jpg" class="mainlogo" alt="내손안의 행정비서" />
+        <!-- 파일명 변경 반영 -->
+        <img src="sungnamlogo.png" class="seongnam" alt="성남시 로고" />
+        <img src="mainlogo.jpg" class="mainlogo" alt="내 손 안의 행정비서 로고" />
       </div>
       <div class="search-wrap">
         <div class="bar">
@@ -103,49 +120,79 @@
         <button class="demo-btn" onclick="demo(1)">시연1</button>
         <button class="demo-btn" onclick="demo(2)">시연2</button>
       </div>
+
       <div class="qline" id="qline"></div>
+
+      <!-- 로딩 UI: greenrotate.gif -->
+      <div id="loading" class="loading hidden" aria-live="polite">
+        <img src="greenrotate.gif" alt="로딩 중">
+        <span>🔄 조회 중입니다…</span>
+      </div>
+
       <div class="answer" id="answer">검색어를 입력하고 ‘검색’을 눌러주세요.</div>
     </div>
   </main>
 
   <script>
     const params = new URLSearchParams(location.search);
-    const q = params.get('q') || '';
+    const initialQ = params.get('q') || '';
     const $q = document.getElementById('q');
     const $qline = document.getElementById('qline');
     const $answer = document.getElementById('answer');
+    const $loading = document.getElementById('loading');
 
-    if(q){ $q.value=q; fetchAnswer(q); }
+    if(initialQ){
+      $q.value = initialQ;
+      fetchAnswer(initialQ);
+    }
 
     function reSearch(){
-      const val=$q.value.trim();
+      const val = $q.value.trim();
       if(!val) return;
       history.replaceState(null,'','result.html?q='+encodeURIComponent(val));
       fetchAnswer(val);
     }
 
     function demo(type){
-      let text= type===1 ? '수의계약은 얼마까지 가능해?' : '협상에 의한 계약 절차 알려줘';
-      $q.value=text;
+      const text = (type===1) ? '수의계약은 얼마까지 가능해?' : '협상에 의한 계약 절차 알려줘';
+      $q.value = text;
       history.replaceState(null,'','result.html?q='+encodeURIComponent(text));
       fetchAnswer(text);
     }
 
-    async function fetchAnswer(q){
-      $qline.textContent=`검색어: “${q}”`;
-      $answer.textContent='🔍 검색 중...';
-      try{
-        const res=await fetch('/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})});
-        if(!res.ok) throw new Error('서버 오류');
-        const data=await res.json();
-        $answer.textContent=data?.answer||'답변을 생성하지 못했습니다.';
-      }catch(e){
-        $answer.textContent='API 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+    // 로딩 토글
+    function setLoading(isLoading){
+      if(isLoading){
+        $loading.classList.remove('hidden');
+        $answer.classList.add('hidden');
+      }else{
+        $loading.classList.add('hidden');
+        $answer.classList.remove('hidden');
       }
     }
 
-    $q.addEventListener('keydown',e=>{if(e.key==='Enter') reSearch();});
+    // Gemini 백엔드 호출
+    async function fetchAnswer(q){
+      $qline.textContent = `검색어: “${q}”`;
+      setLoading(true);
+      try{
+        const res = await fetch('/ask', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ question: q })
+        });
+        if(!res.ok) throw new Error('서버 오류');
+        const data = await res.json();
+        $answer.textContent = data?.answer || '답변을 생성하지 못했습니다.';
+      }catch(e){
+        $answer.textContent = 'API 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+        console.error(e);
+      }finally{
+        setLoading(false);
+      }
+    }
+
+    $q.addEventListener('keydown', e => { if(e.key==='Enter') reSearch(); });
   </script>
 </body>
 </html>
-
