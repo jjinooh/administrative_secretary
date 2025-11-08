@@ -5,169 +5,101 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>내 손 안의 행정비서</title>
   <style>
-    :root {
-      --border:#dadce0;
-      --bg:#fffcf0;
-    }
-    *{box-sizing:border-box}
+    :root { --border:#dadce0; --bg:#fffcf0; }
+    *{box-sizing:border-box; margin:0; padding:0;}
     body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
       background:var(--bg);
       color:#202124;
-      height:100vh;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:flex-start;
-      padding-top:300px;
+      font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      display:flex; flex-direction:column; align-items:center;
+      min-height:100vh; justify-content:center;
       overflow-x:hidden;
     }
 
     .container{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
       text-align:center;
-      width:100%;
-      max-width:600px;
-      padding:0 16px;
+      width:100%; max-width:600px; padding:0 20px;
     }
 
-    /* 상단 로고들 */
-    .seongnam-logo{
-      width:120px;
-      height:auto;
-      margin-bottom:15px;
-    }
-
-    /* 중앙 로고 */
-    .main-logo{
-      width:720px;
-      height:auto;
-      margin-bottom:80px;
-    }
+    /* 로고 */
+    .seongnam-logo{ width:100px; margin-bottom:12px; }
+    .main-logo{ width:90%; max-width:480px; margin-bottom:40px; }
 
     /* 검색창 */
     .bar{
-      width:100%;
-      max-width:520px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-      padding:10px 16px;
-      border:1px solid var(--border);
-      border-radius:24px;
-      background:#fff;
-      box-shadow:none;
-      transition:box-shadow .15s ease,border-color .15s ease;
+      display:flex; align-items:center; gap:10px;
+      padding:10px 16px; border:1px solid var(--border);
+      border-radius:30px; background:#fff;
+      transition:.15s;
     }
     .bar:focus-within{
-      border-color:#eee;
-      box-shadow:0 1px 6px rgba(32,33,36,.28);
+      box-shadow:0 2px 8px rgba(0,0,0,.15);
+      border-color:#ccc;
     }
-    .bar input{
-      flex:1;
-      border:0;
-      outline:0;
-      font-size:16px;
-      background:transparent;
+    input{
+      flex:1; border:0; outline:0;
+      font-size:16px; background:transparent;
       padding:8px 0;
     }
-    .bar button{
-      border:0;
-      background:transparent;
-      cursor:pointer;
-      padding:6px 8px;
-      border-radius:8px;
-      font-size:14px;
-      color:#5f6368;
+    button{
+      border:2px solid #000; background:#fff; color:#000;
+      border-radius:8px; cursor:pointer; padding:8px 16px;
+      transition:.2s;
     }
+    button:hover{ background:#000; color:#fff; }
 
-    /* 버튼 */
     .actions{
-      display:flex;
-      gap:10px;
-      margin-top:24px;
-      flex-wrap:wrap;
-      justify-content:center;
-    }
-    .btn{
-      padding:9px 16px;
-      border:1px solid #000;
-      background:#fff;
-      color:#000;
-      border-radius:6px;
-      cursor:pointer;
-      font-size:14px;
-      transition:all .2s ease;
-    }
-    .btn:hover{
-      background:#000;
-      color:#fff;
+      display:flex; flex-wrap:wrap; justify-content:center;
+      gap:10px; margin-top:24px;
     }
 
-    /* 캐릭터 GIF 배치 */
-    .pinkie, .choraeng {
-      position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 180px;
-      height: auto;
-      z-index: 1;
+    /* 캐릭터 */
+    .pinkie,.choraeng{
+      position:fixed; top:50%; transform:translateY(-50%);
+      width:150px; z-index:1;
     }
-    .pinkie {
-      left: 5%;
-    }
-    .choraeng {
-      right: 5%;
-    }
+    .pinkie{ left:4%; }
+    .choraeng{ right:4%; }
 
-    @media (max-width: 900px){
-      .pinkie, .choraeng {
-        width: 100px;
-        opacity: 0.8;
-      }
-      .pinkie { left: 2%; }
-      .choraeng { right: 2%; }
+    @media(max-width:768px){
+      body{padding:40px 0;}
+      .pinkie,.choraeng{ width:90px; opacity:.8; }
+      .main-logo{ max-width:320px; margin-bottom:32px; }
+      .bar{padding:8px 12px;}
+      input{font-size:14px;}
+      button{font-size:13px; padding:6px 12px;}
     }
   </style>
 </head>
 <body>
-  <!-- 좌우 캐릭터 -->
-  <img src="pink.gif" alt="분홍이" class="pinkie" />
-  <img src="greenhead.gif" alt="초롱이" class="choraeng" />
+  <img src="분홍이완료.gif" class="pinkie" alt="분홍이" />
+  <img src="초랭이.gif" class="choraeng" alt="초랭이" />
 
   <div class="container">
-    <!-- 상단 성남시 로고 -->
-    <img src="sungnamlogo.png" alt="성남시 로고" class="seongnam-logo" />
+    <img src="성남시.png" class="seongnam-logo" alt="성남시 로고" />
+    <img src="내손안의행정비서 로고.jpg" class="main-logo" alt="내 손 안의 행정비서" />
 
-    <!-- 중앙 메인 로고 -->
-    <img src="mainlogo.jpg" alt="내 손 안의 행정비서 로고" class="main-logo" />
-
-    <!-- 검색창 -->
     <div class="bar">
-       <input id="q" placeholder="예) 수의계약은 얼마까지 가능해?" />
-      <button class="btn" onclick="goResult()">검색</button>
+      <input id="q" placeholder="예) 수의계약은 얼마까지 가능해?" />
+      <button onclick="goResult()">검색</button>
     </div>
 
-    <!-- 버튼 -->
     <div class="actions">
-      <button class="btn" onclick="window.open('https://www.law.go.kr/LSW/main.html');">국가법령정보</button>
-      <button class="btn" onclick="window.open('https://www.elis.go.kr/main');">자치법규정보</button>
+      <button onclick="window.open('https://www.law.go.kr/LSW/main.html')">국가법령정보</button>
+      <button onclick="window.open('https://www.elis.go.kr/main')">자치법규정보</button>
     </div>
   </div>
 
-    <script>
+  <script>
     function goResult(){
       const q = document.getElementById('q').value.trim();
       if(!q) return;
       location.href = 'result.html?q=' + encodeURIComponent(q);
     }
-    document.getElementById('q').addEventListener('keydown', e => {
-      if(e.key === 'Enter') goResult();
+    document.getElementById('q').addEventListener('keydown', e=>{
+      if(e.key==='Enter') goResult();
     });
   </script>
 </body>
 </html>
+
