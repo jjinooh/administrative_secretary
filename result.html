@@ -6,104 +6,90 @@
   <title>검색결과 – 내 손 안의 행정비서</title>
   <style>
     :root { --border:#dadce0; --bg:#fffcf0; }
-    *{box-sizing:border-box}
+    *{box-sizing:border-box; margin:0; padding:0;}
     body{
-      margin:0; background:var(--bg); color:#202124;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+      background:var(--bg); font-family:-apple-system, "Noto Sans KR", sans-serif;
+      color:#202124; margin:0;
     }
-    /* 상단 헤더 */
-    .header{
+
+    /* 헤더 */
+    header{
       position:sticky; top:0; z-index:10;
       background:var(--bg); border-bottom:1px solid #eee;
     }
     .header-inner{
-      max-width:1080px; margin:0 auto; padding:14px 16px;
-      display:flex; align-items:center; gap:16px;
+      max-width:1080px; margin:0 auto; padding:12px 16px;
+      display:flex; align-items:center; gap:14px; flex-wrap:wrap;
     }
-    .logos{
-      display:flex; align-items:center; gap:12px; flex:0 0 auto;
-    }
-    .logos img{ display:block; }
-    .seongnam{ height:36px; }
-    .mainlogo{ height:48px; }
-    .search-wrap{
-      flex:1 1 auto; display:flex; align-items:center; gap:12px;
-    }
+    .logos img{height:40px;}
+    .mainlogo{height:48px;}
+    .search-wrap{flex:1; display:flex; align-items:center; gap:10px;}
     .bar{
       flex:1; display:flex; align-items:center; gap:10px;
-      padding:8px 14px; background:#fff; border:1px solid var(--border); border-radius:24px;
+      padding:8px 14px; background:#fff;
+      border:1px solid var(--border); border-radius:24px;
     }
-    .bar input{ flex:1; border:0; outline:0; font-size:16px; padding:6px 0; background:transparent; }
+    .bar input{
+      flex:1; border:0; outline:0; font-size:15px; background:transparent;
+    }
     .bar button{
-      padding:8px 14px; border:1px solid #000; background:#fff; color:#000; border-radius:6px; cursor:pointer;
+      padding:8px 14px; border:2px solid #000;
+      background:#fff; border-radius:6px; cursor:pointer;
     }
-    .bar button:hover{ background:#000; color:#fff; }
-
-    /* 상단 오른쪽 버튼 */
-    .actions{
-      flex:0 0 auto; display:flex; gap:10px; margin-left:auto;
-    }
+    .bar button:hover{background:#000;color:#fff;}
+    .actions{display:flex; gap:8px; flex-wrap:wrap;}
     .btn{
-      padding:8px 14px; border:1px solid #000; background:#fff; color:#000;
-      border-radius:6px; cursor:pointer; font-size:14px; transition:.2s;
+      padding:8px 12px; border:2px solid #000;
+      background:#fff; border-radius:6px; cursor:pointer;
+      font-size:14px;
     }
-    .btn:hover{ background:#000; color:#fff; }
+    .btn:hover{background:#000;color:#fff;}
 
-    /* 콘텐츠 */
-    .content{
-      max-width:800px; margin:24px auto; padding:0 16px;
-    }
+    /* 내용 */
+    main{max-width:800px;margin:24px auto;padding:0 16px;}
     .result-box{
-      background:#fff;
-      border:1px solid #ddd;
-      border-radius:12px;
-      padding:18px;
-      line-height:1.7;
-      position:relative; /* 시연 버튼 위치 기준 */
+      background:#fff; border:1px solid #ddd;
+      border-radius:12px; padding:18px; position:relative;
     }
-    .qline{ color:#5f6368; font-size:14px; margin-bottom:8px; }
-    .answer{ white-space:pre-line; }
+    .qline{font-size:14px;color:#5f6368;margin-bottom:8px;}
+    .answer{white-space:pre-line;line-height:1.7;}
 
-    /* 시연 버튼들 (답변창 오른쪽 위) */
+    /* 시연 버튼 */
     .demo-buttons{
-      position:absolute;
-      top:12px;
-      right:12px;
-      display:flex;
-      gap:8px;
+      position:absolute; top:12px; right:12px;
+      display:flex; gap:6px;
     }
     .demo-btn{
-      padding:5px 10px;
-      font-size:13px;
-      border:1px solid #000;
-      background:#fff;
-      color:#000;
-      border-radius:6px;
-      cursor:pointer;
-      transition:all .2s;
+      padding:5px 10px; font-size:13px;
+      border:1px solid #000; background:#fff;
+      border-radius:6px; cursor:pointer;
+      transition:.2s;
     }
-    .demo-btn:hover{
-      background:#000;
-      color:#fff;
+    .demo-btn:hover{background:#000;color:#fff;}
+
+    @media(max-width:768px){
+      .header-inner{gap:8px;}
+      .logos img{height:32px;}
+      .mainlogo{height:40px;}
+      .bar input{font-size:14px;}
+      .btn{font-size:13px; padding:6px 10px;}
+      .result-box{padding:14px;}
     }
   </style>
 </head>
 <body>
-  <!-- 헤더 -->
-  <header class="header">
+  <header>
     <div class="header-inner">
       <div class="logos">
-        <img src="sungnamlogo.png" alt="성남시 로고" class="seongnam" />
-        <img src="mainlogo.jpg" alt="내 손 안의 행정비서 로고" class="mainlogo" />
+        <img src="성남시.png" class="seongnam" alt="성남시" />
+        <img src="내손안의행정비서 로고.jpg" class="mainlogo" alt="내손안의 행정비서" />
       </div>
-
       <div class="search-wrap">
         <div class="bar">
           <input id="q" placeholder="예) 수의계약은 얼마까지 가능해?" />
           <button onclick="reSearch()">검색</button>
         </div>
       </div>
-
       <div class="actions">
         <button class="btn" onclick="window.open('https://www.law.go.kr/LSW/main.html')">국가법령정보</button>
         <button class="btn" onclick="window.open('https://www.elis.go.kr/main')">자치법규정보</button>
@@ -111,77 +97,55 @@
     </div>
   </header>
 
-  <!-- 결과 영역 -->
-  <main class="content">
-    <div id="result" class="result-box">
-      <!-- 시연 버튼 (답변창 우상단) -->
+  <main>
+    <div class="result-box">
       <div class="demo-buttons">
         <button class="demo-btn" onclick="demo(1)">시연1</button>
         <button class="demo-btn" onclick="demo(2)">시연2</button>
       </div>
-
       <div class="qline" id="qline"></div>
       <div class="answer" id="answer">검색어를 입력하고 ‘검색’을 눌러주세요.</div>
     </div>
   </main>
 
   <script>
-    // URL에서 q 파라미터 읽어서 초기 표시
     const params = new URLSearchParams(location.search);
-    const initialQ = params.get('q') || '';
+    const q = params.get('q') || '';
     const $q = document.getElementById('q');
     const $qline = document.getElementById('qline');
     const $answer = document.getElementById('answer');
 
-    if (initialQ) {
-      $q.value = initialQ;
-      fetchAnswer(initialQ);
-    }
+    if(q){ $q.value=q; fetchAnswer(q); }
 
-    // 검색 실행
     function reSearch(){
-      const q = $q.value.trim();
-      if(!q) return;
-      history.replaceState(null, '', 'result.html?q=' + encodeURIComponent(q));
-      fetchAnswer(q);
+      const val=$q.value.trim();
+      if(!val) return;
+      history.replaceState(null,'','result.html?q='+encodeURIComponent(val));
+      fetchAnswer(val);
     }
 
-    // 시연 버튼
     function demo(type){
-      let q = '';
-      if(type === 1) q = '수의계약은 얼마까지 가능해?';
-      if(type === 2) q = '협상에 의한 계약 절차 알려줘';
-      $q.value = q;
-      history.replaceState(null, '', 'result.html?q=' + encodeURIComponent(q));
-      fetchAnswer(q);
+      let text= type===1 ? '수의계약은 얼마까지 가능해?' : '협상에 의한 계약 절차 알려줘';
+      $q.value=text;
+      history.replaceState(null,'','result.html?q='+encodeURIComponent(text));
+      fetchAnswer(text);
     }
 
-    // ✅ Gemini 백엔드(/ask) 호출하여 답변 표시
     async function fetchAnswer(q){
-      $qline.textContent = `검색어: “${q}”`;
-      $answer.textContent = '🔍 검색 중...';
-
+      $qline.textContent=`검색어: “${q}”`;
+      $answer.textContent='🔍 검색 중...';
       try{
-        const res = await fetch('/ask', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: q })
-        });
-
-        if(!res.ok){
-          throw new Error('서버 응답이 올바르지 않습니다.');
-        }
-
-        const data = await res.json();
-        $answer.textContent = (data && data.answer) ? data.answer : '답변을 생성하지 못했습니다.';
-      }catch(err){
-        $answer.textContent = 'API 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
-        console.error(err);
+        const res=await fetch('/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})});
+        if(!res.ok) throw new Error('서버 오류');
+        const data=await res.json();
+        $answer.textContent=data?.answer||'답변을 생성하지 못했습니다.';
+      }catch(e){
+        $answer.textContent='API 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
       }
     }
 
-    // Enter 키로 재검색
-    $q.addEventListener('keydown', e => { if(e.key==='Enter') reSearch(); });
+    $q.addEventListener('keydown',e=>{if(e.key==='Enter') reSearch();});
   </script>
 </body>
 </html>
+
