@@ -121,87 +121,61 @@
   <img src="pinkgreen1.gif" class="chara-small" alt="초랭이" id="floatingChara">
 
   <script>
-    // 💡 중요: 이 URL을 **본인의 Apps Script 웹앱 URL로 교체**해야 합니다.
-    // 기존 URL 유지:
-    const ASK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd_EABVzt49XDVzgyr0FI3ybwOSGrit77To0kh27RnOTnmBVLT_xgAXYItOZjKq7eT7g/exec';
-
+    // URL에서 q 파라미터 읽어서 초기 표시
     const params = new URLSearchParams(location.search);
     const initialQ = params.get('q') || '';
     const $q = document.getElementById('q');
     const $qline = document.getElementById('qline');
     const $answer = document.getElementById('answer');
-    const $loading = document.getElementById('loading');
-    const $chara = document.getElementById('floatingChara');
 
-    if(initialQ){ $q.value = initialQ; fetchAnswer(initialQ); }
+    if (initialQ) {
+      $q.value = initialQ;
+      fetchAnswer(initialQ);
+    }
 
+    // 검색 실행
     function reSearch(){
-      const val = $q.value.trim();
-      if(!val) return;
-      // 서브경로에서 동작하도록 상대경로 사용
-      history.replaceState(null,'','result.html?q='+encodeURIComponent(val));
-      fetchAnswer(val);
+      const q = $q.value.trim();
+      if(!q) return;
+      history.replaceState(null, '', 'result.html?q=' + encodeURIComponent(q));
+      fetchAnswer(q);
     }
 
+    // 시연 버튼
     function demo(type){
-      const text = (type===1) ? '수의계약은 얼마까지 가능해?' : '협상에 의한 계약 절차 알려줘';
-      $q.value = text;
-      history.replaceState(null,'','result.html?q='+encodeURIComponent(text));
-      fetchAnswer(text);
+      let q = '';
+      if(type === 1) q = '수의계약은 얼마까지 가능해?';
+      if(type === 2) q = '협상에 의한 계약 절차 알려줘';
+      $q.value = q;
+      history.replaceState(null, '', 'result.html?q=' + encodeURIComponent(q));
+      fetchAnswer(q);
     }
 
-    function setLoading(isLoading){
-      if(isLoading){
-        $loading.classList.remove('hidden');
-        $answer.classList.add('hidden');
-        // 캐릭터 표시(선택): 모바일에서는 숨김 CSS가 적용됨
-        $chara.style.display = 'block';
-      }else{
-        $loading.classList.add('hidden');
-        $answer.classList.remove('hidden');
-        $chara.style.display = 'none';
-      }
-    }
-
+    // ✅ Gemini 백엔드(/ask) 호출하여 답변 표시
     async function fetchAnswer(q){
       $qline.textContent = `검색어: “${q}”`;
-      setLoading(true);
+      $answer.textContent = '🔍 검색 중...';
+
       try{
-        const res = await fetch(ASK_ENDPOINT, {
+        const res = await fetch('/ask', {
           method: 'POST',
-          headers: {'Content-Type':'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ question: q })
         });
-        
-        // HTTP 응답이 정상이 아닐 경우 (예: 404, 500 등)
+
         if(!res.ok){
-          throw new Error(`Apps Script 서버 오류: HTTP ${res.status}`);
+          throw new Error('서버 응답이 올바르지 않습니다.');
         }
-        
+
         const data = await res.json();
-        
-        // Apps Script에서 반환한 응답 메시지 처리
-        const answerText = data?.answer || '답변을 생성하지 못했습니다.';
-        
-        // 💡 중요: API 키 오류 메시지 등에 대한 클라이언트 측 경고
-        if(answerText.includes('API 키가 설정되지 않았습니다.') || answerText.startsWith('오류:')){
-          $answer.style.color = 'red';
-          $answer.textContent = '❌ 시스템 오류가 발생했습니다. Apps Script의 로그와 API 키 설정을 확인해주세요. \n\n' + answerText;
-        } else {
-          $answer.style.color = '#202124'; // 기본 색상으로 복구
-          $answer.textContent = answerText;
-        }
-        
-      }catch(e){
-        console.error(e);
-        // 네트워크 또는 파싱 오류 발생 시
-        $answer.style.color = 'red';
-        $answer.textContent = `❌ 네트워크 또는 통신 오류가 발생했습니다. (콘솔 확인) \n에러: ${e.message}`;
-      }finally{
-        setLoading(false);
+        $answer.textContent = (data && data.answer) ? data.answer : '답변을 생성하지 못했습니다.';
+      }catch(err){
+        $answer.textContent = 'API 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+        console.error(err);
       }
     }
 
+    // Enter 키로 재검색
     $q.addEventListener('keydown', e => { if(e.key==='Enter') reSearch(); });
   </script>
 </body>
